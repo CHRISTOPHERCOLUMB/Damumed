@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="theme-color" content="#1a1a1e">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DAMUMED</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #1a1a1e;
+            --card-bg: #2a2a30;
+            --text-main: #ffffff;
+            --text-muted: #8b8b95;
+            --accent: #1ea88e;
+            --border-color: #3a3a42;
+            --blue-card: #4a8ab9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Контейнер приложения */
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100dvh;
+            background-color: var(--bg-color);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        @media (min-width: 421px) {
+            .app-container {
+                height: 90vh;
+                max-height: 850px;
+                border-radius: 24px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+                border: 1px solid #333;
+            }
+        }
+
+        /* Шапка */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background-color: var(--bg-color);
+            z-index: 10;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .profile-circle {
+            width: 36px;
+            height: 36px;
+            background-color: #d48c94;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .logo-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+            font-size: 20px;
+            color: var(--text-main);
+        }
+
+        /* Основной контент со скроллом */
+        .content {
+            flex: 1;
+            min-height: 0; /* Важно для работы скролла */
+            overflow-y: auto;
+            padding: 0 20px 90px 20px; /* 90px снизу, чтобы меню не перекрывало контент */
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .content::-webkit-scrollbar { display: none; }
+
+        /* Скрытие экранов */
+        .screen { display: none; animation: fadeIn 0.2s ease-in-out; }
+        .screen.active { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- Экран 1: Главная --- */
+        .carousel {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            margin: 0 -20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            scrollbar-width: none;
+        }
+        .carousel::-webkit-scrollbar { display: none; }
+        
+        .carousel-card {
+            min-width: 160px;
+            height: 100px;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .c-blue { background-color: var(--blue-card); }
+        .c-white { background-color: #fff; color: #333; }
+        
+        .grid-menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .menu-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            height: 120px;
+            cursor: pointer;
+        }
+        .menu-card i { font-size: 28px; color: var(--accent); }
+
+        .large-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 160px;
+        }
+        .large-card-text { font-size: 18px; font-weight: 600; line-height: 1.4; }
+        .btn-accent {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        /* --- Шапка страниц --- */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            font-size: 20px;
+            font-weight: 600;
+            background-color: var(--bg-color);
+            flex-shrink: 0;
+        }
+        .page-header i { cursor: pointer; }
+
+        /* --- Инфо-блоки --- */
+        .info-block {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .info-block-col { display: flex; flex-direction: column; gap: 5px; }
+        .text-muted { color: var(--text-muted); font-size: 13px; }
+        .text-main { font-size: 15px; font-weight: 500; }
+
+        /* --- Списки --- */
+        .list-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .list-item {
+            display: flex; align-items: center; padding: 18px 15px;
+            border-bottom: 1px solid var(--border-color); gap: 15px; cursor: pointer;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item i:first-child { color: var(--accent); font-size: 20px; width: 24px; text-align: center; }
+        .list-item .text { flex: 1; font-size: 15px; line-height: 1.3; }
+        .list-item i:last-child { color: var(--text-muted); font-size: 14px; }
+
+        /* --- Экран детализации --- */
+        .detail-container { background: var(--bg-color); }
+        .detail-action {
+            display: flex; align-items: center; gap: 15px;
+            padding: 20px; border-bottom: 8px solid #111; font-weight: 500; cursor: pointer;
+        }
+        .detail-action i { color: var(--accent); font-size: 20px; }
+        .detail-title { font-size: 16px; font-weight: 600; padding: 20px 20px 10px; }
+        .detail-row {
+            display: flex; flex-direction: column; gap: 5px;
+            padding: 15px 20px; border-bottom: 1px solid var(--border-color);
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row .label { color: var(--text-muted); font-size: 14px; }
+        .detail-row .value { color: var(--text-main); font-size: 16px; }
+
+        /* --- Нижнее меню --- */
+        .bottom-nav {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background-color: var(--bg-color); border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; padding: 10px 5px 15px; z-index: 20;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            color: var(--text-muted); font-size: 11px; flex: 1; cursor: pointer; position: relative;
+            min-width: 0; /* Важно, чтобы текст не ломал верстку */
+        }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: var(--text-main); font-weight: 600; }
+        
+        /* ИСПРАВЛЕНИЕ ТЕКСТА В МЕНЮ */
+        .nav-item span {
+            white-space: nowrap; /* Запрещаем перенос на новую строку */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Добавляем троеточие, если не влезает */
+            width: 100%;
+            text-align: center;
+            padding: 0 2px;
+        }
+
+        .badge {
+            position: absolute; top: -5px; right: 12px; background-color: var(--accent);
+            color: white; font-size: 10px; padding: 2px 5px; border-radius: 10px; font-weight: bold;
+        }
+
+        /* --- Модальное окно (Форма) --- */
+        .modal-overlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px); padding: 20px;
+        }
+        .modal-content {
+            background: var(--card-bg); padding: 20px; border-radius: 16px;
+            width: 100%; display: flex; flex-direction: column; gap: 12px;
+        }
+        .modal-content h3 { font-size: 18px; margin-bottom: 5px; text-align: center; color: white;}
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 12px; color: var(--text-muted); }
+        .modal-content input {
+            background: var(--bg-color); border: 1px solid var(--border-color);
+            color: white; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%;
+        }
+        .modal-content input:focus { outline: none; border-color: var(--accent); }
+        .modal-btns { display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; }
+        .modal-btns button {
+            flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 600; font-size: 14px; cursor: pointer;
+        }
+        .modal-btns button:first-child { background: #3a3a42; color: white; }
+        .modal-btns button:last-child { background: var(--accent); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- Экран 1: Главная -->
+    <div id="screen-home" class="screen active">
+        <div class="header">
+            <div class="profile-circle">ЧВ</div>
+            <div class="logo-center"><i class="fas fa-circle-play"></i> DAMUMED</div>
+            <div class="header-right">
+                <i class="fas fa-shield-halved" style="color:var(--text-muted)"></i>
+                <i class="fas fa-cart-shopping"></i>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="carousel">
+                <div class="carousel-card c-blue">
+                    <span>Платежи<br>ОСМС</span>
+                    <i class="fas fa-id-card" style="font-size: 30px; align-self: flex-end; opacity: 0.5;"></i>
+                </div>
+                <div class="carousel-card c-white">
+                    <span>Проверьте<br>личные данные</span>
+                    <i class="fas fa-triangle-exclamation" style="font-size: 30px; color: #4a8ab9; align-self: flex-end;"></i>
+                </div>
+                <div class="carousel-card c-blue">
+                    <span>Отслеживайте<br>свои заказы</span>
+                </div>
+            </div>
+
+            <div class="grid-menu">
+                <div class="menu-card" onclick="nav('screen-polyclinic')">
+                    <i class="fas fa-hospital"></i>
+                    <span>Моя поликлиника</span>
+                </div>
+                <div class="menu-card">
+                    <i class="fas fa-shield-virus"></i>
+                    <span>Пакет ОСМС</span>
+                </div>
+                <div class="menu-card" onclick="nav('screen-data')">
+                    <i class="fas fa-id-badge"></i>
+                    <span>Мои данные</span>
+                </div>
+                <div class="menu-card">
+                    <i class="fas fa-cart-plus"></i>
+                    <span>Партнеры Damumed</span>
+                </div>
+                <div class="menu-card">
+                    <i class="fas fa-th"></i>
+                    <span>Все рубрики</span>
+                </div>
+            </div>
+
+            <div class="large-card">
+                <div>
+                    <div class="large-card-text">Результаты<br>анализов</div>
+                    <button class="btn-accent">Перейти</button>
+                </div>
+                <div style="font-size: 60px; color: #5a9bc4; opacity: 0.8;">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран 3: Мои данные -->
+    <div id="screen-data" class="screen">
+        <div class="header" style="justify-content: center; border-bottom: 1px solid var(--border-color);">
+            <div class="logo-center" style="position: static; transform: none;"><i class="fas fa-circle-play"></i> DAMUMED</div>
+        </div>
+        <div class="content" style="padding-top: 15px;">
+            <div class="list-container">
+                <div class="list-item">
+                    <i class="fas fa-hospital-user"></i>
+                    <div class="text">Данные в поликлинике<br>прикрепления</div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="list-item" onclick="nav('screen-meddata')">
+                    <i class="fas fa-file-medical"></i>
+                    <div class="text">Медицинские данные в<br>клиниках</div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="list-item">
+                    <i class="fas fa-clinic-medical"></i>
+                    <div class="text">Клиники с данными обо мне</div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="list-item">
+                    <i class="fas fa-user"></i>
+                    <div class="text">Профиль в Damumed</div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран 4: Медицинские данные -->
+    <div id="screen-meddata" class="screen">
+        <div class="page-header">
+            <i class="fas fa-arrow-left" onclick="nav('screen-data')"></i>
+            <span>Медицинские данные</span>
+        </div>
+        <div class="content">
+            <div class="list-container">
+                <div class="list-item">
+                    <i class="fas fa-bars"></i>
+                    <div class="text">Все данные</div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="list-item">
+                    <i class="fas fa-flask"></i>
+                    <div class="text">Анализы</div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="list-item" onclick="nav('screen-sicklist')">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <div class="text">Больничные</div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран 5: Список Больничных -->
+    <div id="screen-sicklist" class="screen">
+        <div class="page-header">
+            <i class="fas fa-arrow-left" onclick="nav('screen-meddata')"></i>
+            <!-- Секретный клик по заголовку -->
+            <span id="secret-title" style="flex: 1; text-align: center; cursor: pointer; user-select: none;">Медицинские данные в...</span>
+            <i class="fas fa-filter"></i>
+        </div>
+        <!-- ИСПРАВЛЕНИЕ: Добавлен padding-bottom 90px, чтобы список не уходил под меню -->
+        <div class="content" style="padding: 0 0 90px 0;">
+            <div id="sick-leave-list">
+                <!-- Сюда рендерятся больничные через JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран 6: Детали больничного -->
+    <div id="screen-sickdetail" class="screen">
+        <div class="page-header">
+            <i class="fas fa-arrow-left" onclick="nav('screen-sicklist')"></i>
+            <span>Больничный лист</span>
+        </div>
+        <div class="content" style="padding: 0 0 90px 0;">
+            <div class="detail-container">
+                <div class="detail-action">
+                    <i class="fas fa-edit"></i>
+                    <span>Запросить данные</span>
+                </div>
+                
+                <div class="detail-title">Информация</div>
+                
+                <div class="detail-row">
+                    <span class="label">Справка</span>
+                    <span class="value">Лист о временной нетрудоспособности</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Организация</span>
+                    <span class="value" id="detail-org">КГП "Рудненская городская поликлиника" УЗ АКО</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Дата с</span>
+                    <span class="value" id="detail-from">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Дата по</span>
+                    <span class="value" id="detail-to">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">ФИО врача</span>
+                    <span class="value" id="detail-doctor">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Дата и время создания записи</span>
+                    <span class="value" id="detail-created">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="add-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Новый больничный</h3>
+            
+            <div class="input-group">
+                <label>Дата с (напр. 13.01.2025)</label>
+                <input type="text" id="input-from" placeholder="ДД.ММ.ГГГГ">
+            </div>
+            
+            <div class="input-group">
+                <label>Дата по (напр. 27.01.2025)</label>
+                <input type="text" id="input-to" placeholder="ДД.ММ.ГГГГ">
+            </div>
+
+            <div class="input-group">
+                <label>ФИО Врача</label>
+                <input type="text" id="input-doctor" placeholder="ИВАНОВ ИВАН ИВАНОВИЧ">
+            </div>
+
+            <div class="input-group">
+                <label>Дата создания записи</label>
+                <input type="text" id="input-created" placeholder="13.01.2025 00:00" value="Сегодня 00:00">
+            </div>
+
+            <div class="modal-btns">
+                <button onclick="closeModal()">Отмена</button>
+                <button onclick="addSickLeave()">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Нижнее меню -->
+    <div class="bottom-nav">
+        <div class="nav-item active" id="nav-home" onclick="nav('screen-home', 'nav-home')">
+            <i class="fas fa-home"></i><span>Главная</span>
+        </div>
+        <div class="nav-item" id="nav-data" onclick="nav('screen-data', 'nav-data')">
+            <i class="fas fa-id-badge"></i><span>Мои данные</span>
+        </div>
+        <div class="nav-item">
+            <i class="far fa-star"></i><span>Избранное</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-list"></i><span>Заказы</span>
+        </div>
+        <div class="nav-item">
+            <div class="badge">58</div><i class="fas fa-ellipsis-h"></i><span>Другое</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 1. ДАННЫЕ БОЛЬНИЧНЫХ ---
+    let sickLeaves = [
+        {
+            id: 1,
+            from: "09.09.2025",
+            to: "22.09.2025",
+            doctor: "ХАШИМОВ ТУЙХАН ШЕРЗАТУЛЫ",
+            created: "09.09.2025 00:00",
+            org: "КГП \"Рудненская городская поликлиника\" УЗ АКО"
+        },
+        {
+            id: 2,
+            from: "13.01.2025",
+            to: "27.01.2025",
+            doctor: "НИЯЗОВ АНАРМАТ ТАХИРЖАНОВИЧ",
+            created: "13.01.2025 00:00",
+            org: "КГП \"Рудненская городская поликлиника\" УЗ АКО"
+        }
+    ];
+
+    // --- 2. НАВИГАЦИЯ ---
+    function nav(screenId, navId = null) {
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+
+        if (navId) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(navId).classList.add('active');
+        }
+    }
+
+    // --- 3. ОТРИСОВКА СПИСКА ---
+    function renderSickLeaves() {
+        const container = document.getElementById('sick-leave-list');
+        container.innerHTML = ''; 
+
+        sickLeaves.sort((a, b) => new Date(b.from.split('.').reverse().join('-')) - new Date(a.from.split('.').reverse().join('-')));
+
+        sickLeaves.forEach(item => {
+            const html = `
+                <div style="padding: 15px 20px; font-size: 14px; color: var(--text-main); background: #222; border-top: 1px solid var(--border-color);">${item.from}</div>
+                <div class="list-item" onclick="openSickDetail(${item.id})" style="background: var(--bg-color); border-bottom: 1px solid var(--border-color);">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <div class="text" style="font-weight: 600;">Больничный лист</div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div style="background: var(--bg-color); padding: 15px 20px 25px 55px; border-bottom: 5px solid #111;">
+                    <div class="text-muted" style="margin-bottom: 5px;">Справка</div>
+                    <div class="text-main" style="font-size: 14px; margin-bottom: 15px;">Лист о временной нетрудоспособности</div>
+                    <div class="text-muted" style="margin-bottom: 5px;">Организация</div>
+                    <div class="text-main" style="font-size: 14px;">${item.org}</div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+    }
+
+    // --- 4. ОТКРЫТИЕ ДЕТАЛЕЙ ---
+    function openSickDetail(id) {
+        const item = sickLeaves.find(x => x.id === id);
+        if (!item) return;
+
+        document.getElementById('detail-from').innerText = item.from;
+        document.getElementById('detail-to').innerText = item.to;
+        document.getElementById('detail-doctor').innerText = item.doctor;
+        document.getElementById('detail-created').innerText = item.created;
+        document.getElementById('detail-org').innerText = item.org;
+
+        nav('screen-sickdetail');
+    }
+
+    // --- 5. СЕКРЕТНЫЙ КЛИК ---
+    let clickCount = 0;
+    let clickTimeout;
+    document.getElementById('secret-title').addEventListener('click', () => {
+        clickCount++;
+        clearTimeout(clickTimeout);
+        clickTimeout = setTimeout(() => { clickCount = 0; }, 800);
+
+        if (clickCount === 3) {
+            document.getElementById('add-modal').style.display = 'flex';
+            clickCount = 0; 
+        }
+    });
+
+    // --- 6. ДОБАВЛЕНИЕ ---
+    function closeModal() {
+        document.getElementById('add-modal').style.display = 'none';
+        document.getElementById('input-from').value = '';
+        document.getElementById('input-to').value = '';
+        document.getElementById('input-doctor').value = '';
+        document.getElementById('input-created').value = 'Сегодня 00:00';
+    }
+
+    function addSickLeave() {
+        const from = document.getElementById('input-from').value || '01.01.2025';
+        const to = document.getElementById('input-to').value || '01.01.2025';
+        const doctor = document.getElementById('input-doctor').value || 'НЕ УКАЗАН';
+        const created = document.getElementById('input-created').value || 'Сегодня 00:00';
+
+        const newSick = {
+            id: Date.now(),
+            from: from,
+            to: to,
+            doctor: doctor.toUpperCase(),
+            created: created,
+            org: "КГП \"Рудненская городская поликлиника\" УЗ АКО"
+        };
+
+        sickLeaves.push(newSick);
+        renderSickLeaves();
+        closeModal();
+    }
+
+    renderSickLeaves();
+
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+</body>
+</html>
